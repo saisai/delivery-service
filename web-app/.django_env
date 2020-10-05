@@ -1,0 +1,12 @@
+# General
+USE_DOCKER=yes
+USE_SENTRY=no
+
+#DB_CONNECTION_STRING=postgresql://colibri:colibri@postgres/colibri
+#DB_CONNECTION_STRING=postgresql://colibri:colibri@host.docker.internal:5435/project
+
+# Redis
+DJANGO_REDIS_URL=redis://redis:6379
+
+DJANGO_CELERY_BROKER_URL=redis://redis:6379
+DJANGO_CELERY_RESULT_BACKEND=redis://redis:6379

@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  postgres:
+    restart: unless-stopped
+    image: postgres:11.5
+    volumes:
+    - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=colibri
+      - POSTGRES_USER=colibri
+      - POSTGRES_PASSWORD=colibri
+    ports:
+      - 5432:5432
+    networks:
+      - colibri_main
+  django:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file:
+      - ./.django_env
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    networks:
+      - colibri_main
+  redis:
+    restart: unless-stopped
+    image: redis:5-alpine
+    container_name: colibri-redis
+    networks:
+      - colibri_main
+  celery:
+    build: .
+    command: celery -A main worker -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - colibri_main
+#  celery-beat:
+#    build: .
+#    command: celery -A main beat -l info
+#    volumes:
+#      - .:/app
+#    depends_on:
+#      - postgres
+#      - redis
+
+networks:
+  colibri_main:
+
+volumes:
+  postgres_data: {}
+  postgres_data_backups: {}
